@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS/editor junk
+.DS_Store
+.vscode/
+*.swp
+
+# Environment/secrets
+.env
+
+# Demo render output
+demo_output/
+
+# Original notebook this project was built from (kept locally, not tracked)
+simpletwin.ipynb
+
+# Digital-twin framework dependency, cloned separately (see README)
+pgmtwin/
+
+# Example artifacts (rebuilt on demand)
+examples/.cache/
+examples/output/

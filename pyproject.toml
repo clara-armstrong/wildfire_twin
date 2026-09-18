@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "wildfire-twin"
+version = "0.1.0"
+requires-python = ">=3.10"
+# pgmtwin is not on PyPI and is not tracked in this repo, so it can't be
+# listed here -- clone github.com/pgmtwin/pgmtwin and `pip install -e` it
+# separately. See the README.
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pyflakes"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wildfire_twin*"]
