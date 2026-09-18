@@ -143,17 +143,20 @@ class TestSolver:
 
     def test_front_width_criterion(self):
         # q=1 is both the class default and thesis Table 5.1's literal value.
-        # It leaves the front under-resolved at grid_size=128 (delta_over_dx
-        # < 1: the front is narrower than one grid cell) -- a known, accepted
-        # property of these parameters at this resolution, not a bug. This
-        # documents that fact as a regression check on the formula itself,
-        # not a pass/fail gate on resolvability.
+        # At the thesis's 128 cells it leaves the front narrower than one
+        # cell; the shipped grid_size refines until delta_over_dx clears 1,
+        # which is the property that has to hold.
         assert WildfireConfig(grid_size=128).q == 1.0
         assert WildfireConfig(grid_size=128).resolution_report()["delta_over_dx"] < 1.0
+        assert WildfireConfig().resolution_report()["delta_over_dx"] > 1.0
 
     def test_cfl_is_satisfied(self, cfg):
         r = cfg.cfl_report()
         assert r["diffusion_ratio"] < 1.0 and r["advection_ratio"] < 1.0
+        # The shipped defaults too: the diffusion limit falls as dx^2, so
+        # refining grid_size without lowering dt would break them.
+        d = WildfireConfig().cfl_report()
+        assert d["diffusion_ratio"] < 1.0 and d["advection_ratio"] < 1.0
 
     def test_boundary_values_are_pinned(self, cfg):
         # apply_boundary_conditions zeroes du/dt and dbeta/dt on all four edges, so

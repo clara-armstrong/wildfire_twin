@@ -17,7 +17,12 @@ from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 import numpy as np
 
-from .config import ObservationConfig, WildfireConfig
+from .config import (
+    DEFAULT_LIKELIHOOD_TEMPERATURE,
+    DEFAULT_MODEL_ERROR_STD,
+    ObservationConfig,
+    WildfireConfig,
+)
 from .domain import LatentDomain
 from .observation import coarsen, observation_dim, observation_times, observe
 from .solver import UNBURNED, Latent, Wildfire
@@ -139,8 +144,8 @@ class InverseSolver:
         domain: LatentDomain,
         cache: ForwardCache,
         obs_config: ObservationConfig,
-        model_error_std: float = 0.06,
-        temperature: float = 60.0,
+        model_error_std: float = DEFAULT_MODEL_ERROR_STD,
+        temperature: float = DEFAULT_LIKELIHOOD_TEMPERATURE,
         discrepancy: Optional[np.ndarray] = None,
     ):
         self.domain = domain

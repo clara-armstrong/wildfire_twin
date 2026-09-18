@@ -6,7 +6,12 @@ from typing import Dict, List, Optional
 import numpy as np
 from pgmtwin.core.digital_asset import BaseDigitalAsset as _Base
 
-from .config import ObservationConfig, WildfireConfig
+from .config import (
+    DEFAULT_LIKELIHOOD_TEMPERATURE,
+    DEFAULT_MODEL_ERROR_STD,
+    ObservationConfig,
+    WildfireConfig,
+)
 from .domain import LatentDomain
 from .inverse import ForwardCache, InverseSolver
 from .priority import optimal_drop
@@ -23,8 +28,8 @@ class WildfireDigitalAsset(_Base):
         state_domain: LatentDomain,
         cache: ForwardCache,
         obs_config: ObservationConfig,
-        model_error_std: float = 0.11,
-        temperature: float = 60.0,
+        model_error_std: float = DEFAULT_MODEL_ERROR_STD,
+        temperature: float = DEFAULT_LIKELIHOOD_TEMPERATURE,
         rng: Optional[np.random.Generator] = None,
     ):
         super().__init__(state_domain, rng=rng)

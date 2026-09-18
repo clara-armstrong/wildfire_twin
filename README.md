@@ -11,7 +11,7 @@ implementation.
 
 1. **Simulate** ([`solver.py`](wildfire_twin/solver.py)): a
    reaction-diffusion-advection PDE (thesis Eq. 3.3), integrated with RK4 on a
-   128x128 grid over contiguous forest/shrub/grass fuel regions and two
+   304x304 grid over contiguous forest/shrub/grass fuel regions and two
    protected asset zones.
 2. **Observe** ([`observation.py`](wildfire_twin/observation.py)): the fire is
    never seen directly, only through a coarse 16x16 noisy sensor reading. With
@@ -84,9 +84,10 @@ This runs the solver ([`solver.py`](wildfire_twin/solver.py)) directly, with no
 inference and no forward cache, so it starts right away without building
 anything first. It draws the fire itself rather than the twin's belief about it.
 
-It uses `q=10.0` because the package default of `q=1.0` leaves the combustion
-front narrower than one grid cell. See the note on `q` in
-[`config.py`](wildfire_twin/config.py).
+It runs on a 128x128 grid for speed, where `q=1.0` would leave the combustion
+front narrower than one cell, so it raises `q` to 10.0 instead. The package
+default resolves the front by refining the grid rather than by changing `q`.
+See the note on `grid_size` in [`config.py`](wildfire_twin/config.py).
 
 ## Status
 

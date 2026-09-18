@@ -33,7 +33,12 @@ class WildfireConfig:
     # Defaults = parameters taken from Table 5.1: Values used for physical and model 
     # parameters in all experiments
 
-    grid_size: int = 128
+    # 304 rather than the thesis's 128: at q = 1 the combustion front is
+    # 0.672 wide, so 128 cells (dx = 1.57) leave it narrower than one cell.
+    # 304 gives dx = 0.66, delta/dx = 1.02. Must stay divisible by
+    # ObservationConfig.coarse_size, and the diffusion limit falls as dx^2,
+    # so refining further needs a smaller dt (see cfl_report).
+    grid_size: int = 304
     domain_min: float = -100.0
     domain_max: float = 100.0
 
@@ -42,10 +47,9 @@ class WildfireConfig:
     epsilon: float = 0.3      # inverse of activation energy
     alpha: float = 0.001      # radiative constant
 
-    # Table 5.1's literal value, also the reference repo's. At grid_size=128
-    # this leaves the combustion front narrower than one grid cell --
-    # front_width()/resolution_report() below give delta/dx < 1. 
-    # This issue is being tabled for now
+    # Table 5.1's literal value, also the reference repo's. Kept at 1.0 and
+    # resolved by refining the grid instead: see grid_size above and
+    # resolution_report() below.
     q: float = 1.0            # nondimensional heat of combustion
 
     # Ignition Gaussian, kept from thesis Eq. 5.1. 
@@ -55,8 +59,8 @@ class WildfireConfig:
     ignition_center_y: float = -35.0      # y_bar_0
     ignition_sigma: float = 5.0           # sigma, Eq. 5.3
 
-    dt: float = 0.02
-    max_steps: int = 400
+    dt: float = 0.1
+    max_steps: int = 80       # t = 8
 
     # Wind, kept from thesis Eq. 5.2 (uniform, not per-cell). The optional
     # one-time direction switch matches the reference repo's changing_wind
@@ -85,16 +89,14 @@ class WildfireConfig:
         return np.linspace(self.domain_min, self.domain_max, self.grid_size)
 
     def front_width(self, u_ref: float = 5.0) -> float:
-        # TODO: Right now, keeping with q value from the thesis, this is not a satisfactory value
         # Combustion-front width, in the same units as dx. The front needs
         # to span more than ~1 dx to be resolved by the finite-difference grid.
-        # Since q = 1, the front does not span more than ~1 dx
         arrhenius = float(np.exp(u_ref / (1.0 + self.epsilon * u_ref)))
         return float(np.sqrt(self.kappa * self.q / (self.epsilon * arrhenius)))
 
     def resolution_report(self, u_ref: float = 5.0) -> Dict[str, float]:
         # Quick check: is this grid fine enough to resolve the front at this q?
-        # For q = 1, we expect this to not work
+        # delta_over_dx must stay above 1.
         delta = self.front_width(u_ref)
         return {"front_width": delta, "dx": self.dx, "delta_over_dx": delta / self.dx}
 
@@ -145,15 +147,13 @@ class ObservationConfig:
     channels: Tuple[str, ...] = ("temperature", "burn_status")
     noise_std: float = 0.05          # additive Gaussian noise on the [0,1] scale
     # Noising the generated data to make inverse problem interesting
-    observe_every: int = 25          # assimilate an observation every N steps
+    observe_every: int = 5           # assimilate an observation every N steps (t = 0.5)
     n_observations: int = 6          # number of assimilation times
 
 # Latent parameters: the unknown of the inverse problem
 
 @dataclass(frozen=True)
 class LatentGridConfig:
-
-
     n_x0: int = 7
     n_y0: int = 7
     wind_speeds: Tuple[float, ...] = (0.5, 1.0, 1.5)
@@ -161,6 +161,14 @@ class LatentGridConfig:
 
     def __len__(self) -> int:
         return self.n_x0 * self.n_y0 * len(self.wind_speeds) * len(self.wind_directions_deg)
+
+
+# Likelihood calibration (inverse.InverseSolver). Defined here so the solver,
+# the digital asset and validation.calibrate cannot drift apart: the
+# temperature below was swept against this model_error_std, so the pair is
+# only meaningful together. See validation.calibrate.
+DEFAULT_MODEL_ERROR_STD = 0.11
+DEFAULT_LIKELIHOOD_TEMPERATURE = 60.0
 
 
 DEFAULT_CONFIG = WildfireConfig()

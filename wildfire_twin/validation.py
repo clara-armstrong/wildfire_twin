@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence
 
 import numpy as np
 
-from .config import ObservationConfig, WildfireConfig
+from .config import DEFAULT_MODEL_ERROR_STD, ObservationConfig, WildfireConfig
 from .domain import LatentDomain
 from .inverse import ForwardCache, InverseSolver
 from .observation import observe
@@ -156,7 +156,7 @@ def calibrate(
     obs_config: ObservationConfig,
     risk_step: int,
     temperatures: Sequence[float],
-    model_error_std: float = 0.11,
+    model_error_std: float = DEFAULT_MODEL_ERROR_STD,
     level: float = 0.9,
 ) -> List[Dict[str, float]]:
     # Sweep the likelihood temperature and report calibration at each value.
