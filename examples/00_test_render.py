@@ -17,7 +17,7 @@ from wildfire_twin.solver import Latent, Wildfire
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-CONFIG = WildfireConfig(grid_size=128, q=10.0, dt=0.02, max_steps=250)
+CONFIG = WildfireConfig(grid_size=350, q=1.0, dt=0.02, max_steps=250)
 LATENT = Latent(
     x0=CONFIG.ignition_center_x, y0=CONFIG.ignition_center_y,
     wind_speed=1.2, wind_direction_deg=45.0,
