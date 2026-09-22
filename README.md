@@ -89,6 +89,16 @@ front narrower than one cell, so it raises `q` to 10.0 instead. The package
 default resolves the front by refining the grid rather than by changing `q`.
 See the note on `grid_size` in [`config.py`](wildfire_twin/config.py).
 
+```bash
+python examples/01_domain_and_evolution.py
+```
+
+Two survey figures from [`render.py`](wildfire_twin/render.py): the domain
+before ignition (fuel types, ignition threshold, wind) and the fire at four
+timesteps. Solver-only on the same 128x128 / `q=10.0` pairing, so the evolution
+figure's top row is ground-truth burn status; with a digital asset it becomes
+the posterior risk map, as sketched at the bottom of the script.
+
 ## Status
 
 62 tests pass. Observations can only come from the simulator itself; there is no
