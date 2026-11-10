@@ -4,11 +4,14 @@ Actions follow modified_config: 0 = no-op, 1 = priority drop.
 """
 
 import csv
+from pathlib import Path
 from typing import Optional
+
 
 import numpy as np
 from pgmtwin.core.tabular_policy import TabularPolicy
 # the policy_table lives in the modified_twin folder
+POLICY_TABLE = Path(__file__).resolve().parent / "policy_table.csv"
 NOOP, DROP = 0, 1
 
 
@@ -103,20 +106,33 @@ class QoITablePolicy(TabularPolicy):
         return (int(action) if np.ndim(action) == 0 else action), state
 
 
-def write_policy_table(policy: TabularPolicy, path: str):
-    dom = policy.state_domain
-    values = dom.index2values(np.arange(len(dom)))
-    with open(path, "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["state", *dom.var2values, "action"])
-        for s, v in enumerate(values):
-            w.writerow([s, *v, policy.actions[int(np.argmax(policy.policy[:, s]))].name])
+def read_policy_table(state_domain, actions, path=POLICY_TABLE) -> np.ndarray:
+    """Policy table, shape (n_actions, n_states), from a CSV with columns
+    state, <one per QoI>, action. Rows are matched to states by their QoI values."""
+    labels = list(state_domain.var2values)
+    names = [a.name for a in actions]
+
+    table = np.zeros((len(actions), len(state_domain)))
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            action = row["action"].strip()
+            if action not in names:
+                raise ValueError(f"{path}: unknown action {action!r}, expected one of {names}")
+            s = int(state_domain.values2index(np.array([float(row[l]) for l in labels])))
+            table[:, s] = 0.0
+            table[names.index(action), s] = 1.0
+
+    missing = np.flatnonzero(table.sum(axis=0) == 0)
+    if missing.size:
+        raise ValueError(f"{path}: {missing.size} states have no row, e.g. state {missing[0]}")
+    return table
 
 
-if __name__ == "__main__":
-    from modified_config import actions, dom
+class CSVTablePolicy(QoITablePolicy):
+    """QoITablePolicy that reads its table from policy_table.csv, so the
+    drop decision for each state can be edited in a spreadsheet."""
 
-    policy = QoITablePolicy(dom, actions)
-    write_policy_table(policy, "policy_table.csv")
-    print(f"wrote policy_table.csv: {int(policy.policy[DROP].sum())} of "
-          f"{len(dom)} states drop")
+    def __init__(self, state_domain, actions, path=POLICY_TABLE,
+                 use_map_state: bool = False, rng=None):
+        super().__init__(state_domain, actions, use_map_state=use_map_state, rng=rng)
+        self.policy = read_policy_table(state_domain, actions, path)

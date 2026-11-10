@@ -3,3 +3,10 @@ __pycache__/
 .DS_Store
 .vscode/
 .ipynb_checkpoints/
+
+# generated output
+sensor_readings.csv
+simple_wildfire.png
+
+# work in progress, not ready to share
+make_alpha_shape.py

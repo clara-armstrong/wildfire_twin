@@ -34,4 +34,4 @@ def make_env(seed=None, qoi_noise_std=qoi_noise_std, n_qoi_samples=n_qoi_samples
         dom, rng=rng, asset_map=sim.asset_value, coords=sim.coords, wind=sim.sc.wind_vec,
         qoi_noise_std=qoi_noise_std, n_qoi_samples=n_qoi_samples,
     )
-    return WildfireEnv(dom, actions, physical, digital, reward, max_episode_steps=60)
+    return WildfireEnv(dom, actions, physical, digital, reward, max_episode_steps=200)

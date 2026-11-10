@@ -79,8 +79,10 @@ class WildfireAsset(BasePhysicalAsset):
         # fixed sensor sites: local temperature readings, NOT the QoIs.
         # The inverse problem is then a real one.
         if sensor_coords is None:
-            g = np.linspace(-120, 120, 5)
-            sensor_coords = np.array([[a, b] for a in g for b in g])
+            # checkerboard half of a 10x10 grid: 50 evenly spread sites
+            g = np.linspace(-120, 120, 10)
+            sensor_coords = np.array([[g[i], g[j]] for i in range(10) for j in range(10)
+                                      if (i + j) % 2 == 0])
         self.sensor_coords = np.asarray(sensor_coords, dtype=float)
         self._sensor_idx = self._locate(self.sensor_coords)
 
@@ -113,7 +115,7 @@ class WildfireAsset(BasePhysicalAsset):
         return self.state
 
     def get_observations(self, n_observations: int = 1) -> np.ndarray: # these need to be made compatible with the inverse problem
-        """Noisy local temperature and burning flag at (25) fixed sensor sites.
+        """Noisy local temperature and burning flag at (50) fixed sensor sites.
 
         Returns (n_observations, 2 * n_sensors): the first n_sensors columns
         are temperatures, the last n_sensors are 0/1 burning flags, each

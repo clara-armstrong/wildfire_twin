@@ -42,7 +42,7 @@ FOREST = FuelType("forest", 0.9, 3.5)
 GRASS = FuelType("grass", 0.5, 2.0)
 SHRUB = FuelType("shrub", 0.7, 3.0)
 STRUCTURE = FuelType("structure", 0.8, 4.5)
-WATER = FuelType("water", 0, 0.9)
+WATER = FuelType("water", 0, np.inf)
 
 
 @dataclass(frozen=True)
@@ -54,10 +54,19 @@ class Scenario:
     # axis-aligned fuel patches over the background, painted in order:
     # (cx, cy, half_x, half_y, fuel)
     fuel_patches: Tuple[Tuple[float, float, float, float, FuelType], ...] = (
-        (0.0, -40.0, 30.0, 30.0, SHRUB),
-        (-10.0, 20.0, 15.0, 15.0, SHRUB),
-        (-70.0, 60.0, 25.0, 25.0, SHRUB),
         (0.0, 150.0, np.inf, 60.0, GRASS),  # full-width strip along the top edge
+        (0.0, 85.0, np.inf, 4.0, WATER),  # creek along the grass edge
+        (20.0, -60.0, 45.0, 20.0, SHRUB),  # shrub belt across the south
+        (-70.0, 50.0, 25.0, 20.0, SHRUB),
+        (110.0, 20.0, 15.0, 35.0, SHRUB),
+        (-45.0, -45.0, 25.0, 25.0, GRASS),  # meadow around the ignition zone
+        (45.0, -35.0, 15.0, 12.0, SHRUB),  # brush leading into the east asset
+        (5.0, 45.0, 15.0, 15.0, GRASS),  # clearing beside the north asset
+        (-115.0, -10.0, 15.0, 25.0, GRASS),
+        (90.0, 65.0, 6.0, 6.0, STRUCTURE),  # outbuildings: burnable, no asset value
+        (-60.0, 100.0, 6.0, 6.0, STRUCTURE),
+        (100.0, 120.0, 20.0, 10.0, WATER),  # pond in the meadow
+        (0.0, 0.0, 20.0, 20.0, WATER),  # lake at the center, painted last
     )
     # axis-aligned asset squares: (cx, cy, half_width, value)
     asset_squares: Tuple[Tuple[float, float, float, float], ...] = (
@@ -68,7 +77,8 @@ class Scenario:
 
     # burn-state thresholds
     burned_fuel_loss: float = 1e-4
-    overwhelming_fuel_loss: float = 0.95
+    overwhelming_fuel_loss: float = 0.99
+
 
     @property
     def wind_vec(self) -> Tuple[float, float]:

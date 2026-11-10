@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm, ListedColormap
 
 from modifiedsimplephysicalmodel import BURNED, BURNING, DESTROYED, UNBURNED, WildfireSim
 
-state_cmap = ListedColormap(["#A8CFA5", "#E9A15B", "#9B91B8", "#55545C"])
+state_cmap = ListedColormap(["#64C15D", "#B47A41", "#7965B4", "#212123"])
 state_norm = BoundaryNorm([-0.5, 0.5, 1.5, 2.5, 3.5], state_cmap.N)
 
 

@@ -23,15 +23,7 @@ class WildfireDigitalAsset(_Base):
     """Digital asset that imports observations from the physical asset at
     each time step.
 
-    NO INVERSE PROBLEM YET: the sensor readings are stored but not inverted.
-    Assimilation uses the ground truth: it takes the true QoI record
-    (burned, burning, asset_damage), adds Gaussian noise, and snaps it onto
-    the state domain. Swap get_assimilation for a real inverse solver later;
-    the stored sensor history is what it will consume.
-
-    Drop placement uses the priority index on coarse risk/temperature maps.
-    These are also ground truth for now (the latest true fields); the
-    inverse problem should eventually provide them.
+    
     """
 
     def __init__(
